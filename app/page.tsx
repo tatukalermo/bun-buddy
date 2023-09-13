@@ -1,24 +1,31 @@
 "use client";
 
-import { generateGameGrid } from "./utils/generateGameGrid";
+import { useEffect, useState } from "react";
+import { generateGameGrid, type gridCell } from "./utils/generateGameGrid";
 
 export default function Home() {
-  const mapWidth = 5;
+  const [mapWidth] = useState(4);
+  const [map, setMap] = useState<gridCell[]>();
+
+  useEffect(() => {
+    setMap(generateGameGrid(mapWidth));
+  }, [mapWidth, setMap]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
-      <div className={`grid grid-cols-${mapWidth}`}>
-        {generateGameGrid(mapWidth).map((cell, index) => {
-          return (
-            <div
-              key={index}
-              className="bg-green-600 odd:bg-green-400 w-12 h-12 text-sm"
-            >
-              <span>x:{cell.x}</span>
-              <span>y:{cell.y}</span>
-            </div>
-          );
-        })}
+    <main className="flex min-h-screen flex-col justify-center items-center bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">
+      <div
+        className={`grid grid-cols-${mapWidth} w-fit shadow-teal-900 shadow-lg border-2 border-green-500`}
+      >
+        {!!map &&
+          map.map((cell) => {
+            return (
+              <div
+                key={`x${cell.x}y${cell.x}`}
+                id={`x${cell.x}y${cell.x}`}
+                className="bg-green-600 border-green-500 border-2 w-12 h-12 text-sm"
+              ></div>
+            );
+          })}
       </div>
     </main>
   );
