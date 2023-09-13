@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { generateGameGrid, type gridCell } from "./utils/generateGameGrid";
 
 export default function Home() {
-  const [mapWidth] = useState(4);
+  const [mapWidth] = useState(6);
   const [map, setMap] = useState<gridCell[]>();
 
   useEffect(() => {
@@ -17,11 +17,11 @@ export default function Home() {
         className={`grid grid-cols-${mapWidth} w-fit shadow-teal-900 shadow-lg border-2 border-green-500`}
       >
         {!!map &&
-          map.map((cell) => {
+          map.map((cell, index) => {
             return (
               <div
-                key={`x${cell.x}y${cell.x}`}
-                id={`x${cell.x}y${cell.x}`}
+                key={`x${cell.x}y${cell.y}`}
+                id={`x${cell.x}y${cell.y}`}
                 className="bg-green-600 border-green-500 border-2 w-12 h-12 text-sm"
               ></div>
             );
