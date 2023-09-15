@@ -1,30 +1,37 @@
 import { create } from "zustand";
+import BasicUnitImage from "../../public/basic-unit.svg";
+import { unitImage } from "../utils/unitImages";
 
-type Unit = {
-  player: "player1" | "player2";
-  unitType: "basic";
+export type UnitVariation = "basic" | "knight";
+
+export type Unit = {
+  owner: "player1" | "player2";
+  unitType: UnitVariation;
   location: {
     x: number;
     y: number;
   };
+  image?: any;
 };
 
 interface GameState {
   playerUnits: Unit[];
-  placeUnit: (
-    location: { x: number; y: number },
-    player: "player1" | "player2"
-  ) => void;
+  placeNewUnit: (unit: Unit) => void;
 }
 
 export const useGameState = create<GameState>((set) => ({
   playerUnits: [],
-  placeUnit: (location, player) =>
+  placeNewUnit: (unit: Unit) =>
     set(({ playerUnits }) => {
       return {
         playerUnits: [
           ...playerUnits,
-          { player: player, unitType: "basic", location },
+          {
+            owner: unit.owner,
+            unitType: unit.unitType,
+            image: unitImage(unit.unitType),
+            location: unit.location,
+          },
         ],
       };
     }),
