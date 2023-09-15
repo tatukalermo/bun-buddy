@@ -1,6 +1,6 @@
 "use client";
 
-import GameMapGrid from "./components/game/GameMapGrid";
+import GameMapGrid from "../components/game/GameMapGrid";
 
 export default function Home() {
   return (
