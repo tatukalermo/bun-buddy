@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { generateGameGrid, type gridCell } from "../../utils/generateGameGrid";
-import { useGameState } from "../../store/useGameState";
+import { generateGameGrid, type gridCell } from "@/utils/generateGameGrid";
+import { useGameState } from "@/store/useGameState";
 import Image from "next/image";
 
 interface GameMapGridProps {

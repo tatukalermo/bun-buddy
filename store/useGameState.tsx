@@ -1,6 +1,5 @@
 import { create } from "zustand";
-import BasicUnitImage from "../../public/basic-unit.svg";
-import { unitImage } from "../utils/unitImages";
+import { unitImage } from "@/utils/unitImages";
 import { Unit } from "@/types";
 
 interface GameState {
