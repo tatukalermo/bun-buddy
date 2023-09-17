@@ -6,7 +6,7 @@ interface ClientWebSocketData {
 }
 
 Bun.serve<ClientWebSocketData>({
-  port: 4000,
+  port: 8080,
   fetch(req, server) {
     const success = server.upgrade(req, {
       // Set username
