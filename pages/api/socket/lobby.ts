@@ -1,7 +1,6 @@
 import type { Unit } from "@/types";
 
 let users: { username: string }[] = [];
-const messages: { username: string; message: string }[] = [];
 const gameState: Unit[] = [];
 
 interface ClientWebSocketData {
@@ -40,28 +39,17 @@ Bun.serve<ClientWebSocketData>({
       );
 
       ws.send(JSON.stringify({ type: "USERS_SET", data: users }));
-      ws.send(JSON.stringify({ type: "MESSAGES_SET", data: messages }));
     },
     // Client sends a message
     message(ws, msg) {
       // Data sent is a string, parse to object
       const newMessage = JSON.parse(msg);
-
-      if (newMessage.type === "MESSAGES_ADD") {
-        newMessage.username = ws.data.username;
-        messages.push(newMessage);
-        // Send message to all clients subscribed to the chat channel
-        ws.publish(
-          "lobby",
-          JSON.stringify({ type: "MESSAGES_ADD", data: newMessage })
-        );
-      } else if (newMessage.type === "GAMESTATE_ADD") {
-        gameState.push(newMessage);
-        ws.publish(
-          "lobby",
-          JSON.stringify({ type: "GAMESTATE_ADD", data: newMessage })
-        );
-      }
+      newMessage.gameState.owner = ws.data.username;
+      gameState.push(newMessage);
+      ws.publish(
+        "lobby",
+        JSON.stringify({ type: "GAMESTATE_ADD", data: newMessage })
+      );
     },
     // a client disconnects from the server
     close(ws) {
