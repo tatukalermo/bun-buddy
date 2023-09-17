@@ -2,17 +2,17 @@
 
 import GameMapGrid from "@/components/game/GameMapGrid";
 import { useEffect } from "react";
+import {
+  listenWebSocketMessageEvents,
+  removeWebSocketMessageEvents,
+} from "@/utils/webSocketClient";
 
 export default function Home() {
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8080/");
-    console.log(socket);
-
-    socket.addEventListener("message", (event) => {
-      console.log(event.data);
-    });
-
-    return socket.removeEventListener("message", () => {});
+    listenWebSocketMessageEvents();
+    return () => {
+      removeWebSocketMessageEvents();
+    };
   }, []);
 
   return (

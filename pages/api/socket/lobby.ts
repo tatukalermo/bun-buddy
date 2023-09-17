@@ -1,5 +1,8 @@
+import type { Unit } from "@/types";
+
 let users: { username: string }[] = [];
 const messages: { username: string; message: string }[] = [];
+const gameState: Unit[] = [];
 
 interface ClientWebSocketData {
   username: string;
@@ -27,12 +30,12 @@ Bun.serve<ClientWebSocketData>({
 
       // Subscribe to pub/sub channel to send/receive broadcast messages,
       // without this the socket could not esnd event to other clients
-      ws.subscribe("chat");
+      ws.subscribe("lobby");
 
       // Broadcast that a user joined
       // On the client side we can parse various messages by the type property
       ws.publish(
-        "chat",
+        "lobby",
         JSON.stringify({ type: "USERS_ADD", data: newUsername })
       );
 
@@ -43,21 +46,29 @@ Bun.serve<ClientWebSocketData>({
     message(ws, msg) {
       // Data sent is a string, parse to object
       const newMessage = JSON.parse(msg);
-      newMessage.username = ws.data.username;
-      messages.push(newMessage);
 
-      // Send message to all clients subscribed to the chat channel
-      ws.publish(
-        "chat",
-        JSON.stringify({ type: "MESSAGES_ADD", data: newMessage })
-      );
+      if (newMessage.type === "MESSAGES_ADD") {
+        newMessage.username = ws.data.username;
+        messages.push(newMessage);
+        // Send message to all clients subscribed to the chat channel
+        ws.publish(
+          "lobby",
+          JSON.stringify({ type: "MESSAGES_ADD", data: newMessage })
+        );
+      } else if (newMessage.type === "GAMESTATE_ADD") {
+        gameState.push(newMessage);
+        ws.publish(
+          "lobby",
+          JSON.stringify({ type: "GAMESTATE_ADD", data: newMessage })
+        );
+      }
     },
     // a client disconnects from the server
     close(ws) {
       users = users.filter((user) => user.username !== ws.data.username);
 
       ws.publish(
-        "chat",
+        "lobby",
         JSON.stringify({ type: "USERS_REMOVE", data: ws.data.username })
       );
     },

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { generateGameGrid, type gridCell } from "@/utils/generateGameGrid";
 import { useGameState } from "@/store/useGameState";
 import Image from "next/image";
+import { addUnit } from "@/utils/webSocketClient";
 
 interface GameMapGridProps {
   mapWidth: number;
@@ -34,6 +35,11 @@ const GameMapGrid: React.FC<GameMapGridProps> = ({ mapWidth }) => {
               }%] aspect-square`}
               onClick={() => {
                 if (!!unit) return; // escape event if unit exists
+                addUnit({
+                  owner: "player1",
+                  unitType: "basic",
+                  location: { x: cell.x, y: cell.y },
+                })
                 placeNewUnit({
                   owner: "player1",
                   unitType: "basic",
