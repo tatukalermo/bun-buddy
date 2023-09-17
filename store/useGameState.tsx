@@ -1,18 +1,6 @@
 import { create } from "zustand";
-import BasicUnitImage from "../../public/basic-unit.svg";
-import { unitImage } from "../utils/unitImages";
-
-export type UnitVariation = "basic" | "knight";
-
-export type Unit = {
-  owner: "player1" | "player2";
-  unitType: UnitVariation;
-  location: {
-    x: number;
-    y: number;
-  };
-  image?: any;
-};
+import { unitImage } from "@/utils/unitImages";
+import { Unit } from "@/types";
 
 interface GameState {
   playerUnits: Unit[];
