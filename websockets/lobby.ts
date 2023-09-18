@@ -1,6 +1,6 @@
 import type { Player, Unit } from "@/types";
 
-let users: Player[] = [];
+const users: Player[] = [];
 const serverGameState: Unit[] = [];
 
 Bun.serve<Player>({
@@ -13,6 +13,7 @@ Bun.serve<Player>({
       },
     });
 
+    // if http upgrade to websocket is successful
     return success
       ? undefined
       : new Response("Upgrade failed :(", { status: 500 });
@@ -20,8 +21,6 @@ Bun.serve<Player>({
   websocket: {
     // New Client connects to the websockets
     open(ws) {
-      if (users.length >= 2) return;
-
       const newUser: Player = {
         username: ws.data.username,
         side: users.length === 0 ? "player1" : "player2",
@@ -53,7 +52,7 @@ Bun.serve<Player>({
     },
     // a client disconnects from the server
     close(ws) {
-      users = users.filter((user) => user.username !== ws.data.username);
+      users.filter((user) => user.username !== ws.data.username);
 
       ws.publish(
         "lobby",
