@@ -4,14 +4,20 @@ import { Player, Unit } from "@/types";
 
 interface GameState {
   player: Player;
+  opponent: Player;
   playerUnits: Unit[];
   placeNewUnit: (unit: Unit) => void;
   updateGameState: (units: Unit[]) => void;
-  playerConnected: (username: string, side: "player1" | "player2") => void;
+  playerConnected: (
+    username: string,
+    side: "player1" | "player2",
+    isOpponent: boolean
+  ) => void;
 }
 
 export const useGameState = create<GameState>((set) => ({
   player: { username: "no connection", side: "player1" },
+  opponent: { username: "no connection", side: "player2" },
   playerUnits: [],
   placeNewUnit: ({ unitType, location, owner }) => {
     set(({ playerUnits }) => {
@@ -43,11 +49,13 @@ export const useGameState = create<GameState>((set) => ({
       };
     });
   },
-  playerConnected: (username, side) => {
+  playerConnected: (username, side, isOpponent) => {
     set(() => {
-      return {
-        player: { username, side },
-      };
+      return isOpponent
+        ? { opponent: { username, side } }
+        : {
+            player: { username, side },
+          };
     });
   },
 }));
