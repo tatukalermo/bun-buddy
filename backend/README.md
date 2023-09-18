@@ -1,4 +1,4 @@
-# bun-buddy
+# backend
 
 To install dependencies:
 
