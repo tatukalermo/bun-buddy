@@ -1,13 +1,9 @@
-import type { Unit } from "@/types";
+import type { Player, Unit } from "@/types";
 
-let users: { username: string }[] = [];
-const gameState: Unit[] = [];
+let users: Player[] = [];
+const serverGameState: Unit[] = [];
 
-interface ClientWebSocketData {
-  username: string;
-}
-
-Bun.serve<ClientWebSocketData>({
+Bun.serve<Player>({
   port: 8080,
   fetch(req, server) {
     const success = server.upgrade(req, {
@@ -24,8 +20,13 @@ Bun.serve<ClientWebSocketData>({
   websocket: {
     // New Client connects to the websockets
     open(ws) {
-      const newUsername = { username: ws.data.username };
-      users.push(newUsername);
+      if (users.length >= 2) return;
+
+      const newUser: Player = {
+        username: ws.data.username,
+        side: users.length === 0 ? "player1" : "player2",
+      };
+      users.push(newUser);
 
       // Subscribe to pub/sub channel to send/receive broadcast messages,
       // without this the socket could not esnd event to other clients
@@ -33,23 +34,22 @@ Bun.serve<ClientWebSocketData>({
 
       // Broadcast that a user joined
       // On the client side we can parse various messages by the type property
-      ws.publish(
-        "lobby",
-        JSON.stringify({ type: "USERS_ADD", data: newUsername })
-      );
+      ws.publish("lobby", JSON.stringify({ type: "USERS_ADD", data: newUser }));
 
       ws.send(JSON.stringify({ type: "USERS_SET", data: users }));
     },
     // Client sends a message
-    message(ws, msg) {
+    message(ws, msg: string) {
       // Data sent is a string, parse to object
-      const newMessage = JSON.parse(msg);
-      newMessage.gameState.owner = ws.data.username;
-      gameState.push(newMessage);
+      const { gameState } = JSON.parse(msg);
+
       ws.publish(
         "lobby",
-        JSON.stringify({ type: "GAMESTATE_ADD", data: newMessage })
+        JSON.stringify({ type: "GAMESTATE_ADD", data: gameState })
       );
+
+      serverGameState.push(gameState);
+      ws.send(JSON.stringify({ type: "GAMESTATE_SET", data: serverGameState }));
     },
     // a client disconnects from the server
     close(ws) {

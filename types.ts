@@ -1,11 +1,14 @@
-export type UnitVariation = "basic" | "knight";
+export type UnitVariation = "basic";
+
+export type Location = { x: number; y: number };
+
+export type PlayerSide = "player1" | "player2";
+
+export type Player = { username: string; side: PlayerSide };
 
 export type Unit = {
-  owner: "player1" | "player2";
+  owner: PlayerSide;
   unitType: UnitVariation;
-  location: {
-    x: number;
-    y: number;
-  };
+  location: Location;
   image?: any;
 };
