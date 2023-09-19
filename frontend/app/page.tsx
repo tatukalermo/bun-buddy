@@ -4,29 +4,27 @@ import GameMapGrid from "@/components/game/GameMapGrid";
 import { useEffect } from "react";
 import { socket } from "@/utils/webSocketClient";
 import { useGameState } from "@/store/useGameState";
-import PlayerInfo from "@/components/PlayerInfo";
 
 export default function Home() {
   const mapWidth = 5;
-  const { placeNewUnit, updateGameState } = useGameState();
+  const { placeNewUnit } = useGameState();
 
+  /* TODO - massive problem updating the state through this event, 
+  useGameState playerUnits array gets filled with duplicates 
+  as the event is called multiple times from a single websocke message*/
   useEffect(() => {
     socket.addEventListener("message", (event: MessageEvent) => {
       const { type, data } = JSON.parse(event.data);
       console.log("anything happened", type, data);
-
       switch (type) {
         case "USERS_SET":
-          console.log("new user added!", data[data.length - 1]);
-          break;
+          return;
         case "GAMESTATE_ADD":
-          console.log("opponent placed piece", data);
           placeNewUnit(data);
-          break;
+          return;
         case "GAMESTATE_SET":
-          console.log("set updated state", data);
-          updateGameState(data);
-          break;
+          placeNewUnit(data[data.length - 1]);
+          return;
       }
     });
     return () => {};
