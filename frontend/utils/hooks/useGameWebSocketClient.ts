@@ -14,7 +14,6 @@ const useGameWebSocketClient = () => {
     if (lastMessage !== null) {
       const msg = JSON.parse(lastMessage.data);
       const { data } = msg;
-
       switch (msg.type) {
         case "GAMESTATE_ADD":
           placeNewUnit(data);
@@ -39,11 +38,11 @@ const useGameWebSocketClient = () => {
           break;
       }
     }
-  }, [lastMessage, setMessageHistory]);
+  }, [lastMessage, setMessageHistory, placeNewUnit]);
 
   const handleClickSendMessage = useCallback(
     (unit: Unit) => sendMessage(JSON.stringify({ gameState: unit })),
-    []
+    [sendMessage]
   );
 
   const connectionStatus = {
