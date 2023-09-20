@@ -1,20 +1,28 @@
 import React from "react";
 import { useGenerateGameGrid } from "@/utils/hooks/useGenerateGameGrid";
 import Image from "next/image";
-import { addUnit } from "@/utils/webSocketClient";
+import { useGameState } from "@/store/useGameState";
+import { Unit } from "@/types";
 
 interface GameMapGridProps {
   mapWidth: number;
+  addUnit: (unit: Unit) => void;
 }
 
-const GameMapGrid: React.FC<GameMapGridProps> = ({ mapWidth }) => {
+const GameMapGrid: React.FC<GameMapGridProps> = ({ mapWidth, addUnit }) => {
   const map = useGenerateGameGrid(mapWidth);
+  const { playerUnits } = useGameState();
   return (
     <div
       className={`grid grid-cols-${mapWidth} shadow-teal-900 shadow-lg border-4 border-green-500`}
     >
       {!!map &&
         map.map((cell, cellIndex) => {
+          const unit = playerUnits.find(
+            (unit) =>
+              unit.location.x === cell.location.x &&
+              unit.location.y === cell.location.y
+          );
           return (
             <div
               key={`${cell.location.x}${cell.location.y}${cellIndex}`}
@@ -22,7 +30,7 @@ const GameMapGrid: React.FC<GameMapGridProps> = ({ mapWidth }) => {
                 100 / mapWidth
               }%] aspect-square`}
               onClick={() => {
-                if (!!cell.unit) return; // escape event if unit exists
+                if (!!unit) return; // escape event if unit exists
                 addUnit({
                   owner: "player1",
                   unitType: "basic",
@@ -34,11 +42,11 @@ const GameMapGrid: React.FC<GameMapGridProps> = ({ mapWidth }) => {
                 <span className="text-gray-800">x{cell.location.x}</span>{" "}
                 <span className="text-gray-300">y{cell.location.y}</span>
               </span>
-              {!!cell.unit && (
+              {!!unit && (
                 <Image
                   className="w-full"
-                  src={cell.unit.image}
-                  alt={`${cell.unit.unitType}-unit-${cell.unit.owner}`}
+                  src={unit.image}
+                  alt={`${unit.unitType}-unit-${unit.owner}`}
                 />
               )}
             </div>
